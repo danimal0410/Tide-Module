@@ -12,9 +12,9 @@ CLOCK=20  #SHCP
 
 #Define Variables - Digits
 
-DATAIN_DIGIT=19
-LATCH_DIGIT=13
-CLOCK_DIGIT=6
+DATAIN_DIGIT=22
+LATCH_DIGIT=17
+CLOCK_DIGIT=4
 
 #Define all LEDs
 
@@ -29,9 +29,15 @@ led8=0x01 #00000001
 
 #Define Digits
 
-digit1=0x80 #10000000
-digit2=0x40 #01000000
-
+digits={"digit1":0x80,
+	"digit2":0x40,
+	"digit3":0x20,
+	"digit4":0x10,
+	"digit5":0x08,
+	"digit6":0x04,
+	"digit7":0x02,
+	"digit8":0x01,
+}
 #Number and Letter Dictionary
 
 letter={"0":0xFC,
@@ -81,9 +87,9 @@ def setup():
     GPIO.output(LATCH,False) #Latch is used to output the saved data
     GPIO.output(CLOCK,False) #Used to shift the value of DATAIN to the register
     GPIO.output(DATAIN,False) #Databit to be shifted into the register
-    GPIO.output(DATAIN_DIGIT,False)
-    GPIO.output(CLOCK_DIGIT,False)
-    GPIO.output(LATCH_DIGIT,False)
+    GPIO.output(DATAIN_DIGIT,False) #Data pin for the second shift register
+    GPIO.output(CLOCK_DIGIT,False) #clock pin for the second shift register
+    GPIO.output(LATCH_DIGIT,False) #latch pin for the second shift register
     
 def cleanup():
     #Set all leds to off
@@ -121,8 +127,6 @@ def shift_digit(input):
 def writeout():
    #Display LEDs
    GPIO.output(LATCH,GPIO.HIGH)
-   #Display for "icsleep" Ms
-   time.sleep(icsleep)
    GPIO.output(LATCH,GPIO.LOW)
    
    #Writes the stored digit "Bit" to Displays
@@ -130,8 +134,6 @@ def writeout():
 def writeout_digit():
    #Display LEDs
    GPIO.output(LATCH_DIGIT,GPIO.HIGH)
-   #Display for "icsleep" Ms
-   time.sleep(icsleep)
    GPIO.output(LATCH_DIGIT,GPIO.LOW)
    
 #Writes a character to the shift register
@@ -140,9 +142,29 @@ def writenumber(number):
     for x in range(0,8):
         shift((number>>x)%2)
         
-def writedigit(input):
+def writedigit(number):
     for x in range(0,8):
-        shift((input>>x)%2)
+        shift_digit((number>>x)%2)
+        
+def writexorrange(range):
+    #close the chain to have no interrupts while displaying
+    character=range[0]&range[-1]
+    for x in range:
+        character^=x
+        writenumber(character)
+        writeout()
+    for x in range:
+        character^=x
+        writenumber(character)
+        writeout()
+    for x in reversed(range):
+        character^=x
+        writenumber(character)
+        writeout()
+    for x in reversed(range):
+        character^=x
+        writenumber(character)
+        writeout()
 
 # BEGIN PROGRAM HERE
 
@@ -154,22 +176,36 @@ try:
 	
 	while True:
 		
-		writenumber(letter["d"])
-		writedigit(digit1)
+		writenumber(letter["s"])
+		writedigit(digits["digit1"])
 		writeout()
 		writeout_digit()
-		time.sleep(1)
+		time.sleep(0.001)
 		
-		writenumber(letter["h"])
-		writedigit(digit2)
+		writenumber(letter["u"])
+		writedigit(digits["digit2"])
 		writeout()
 		writeout_digit()
-		time.sleep(1)
+		time.sleep(0.001)
+		
+		writenumber(letter["c"])
+		writedigit(digits["digit3"])
+		writeout()
+		writeout_digit()
+		time.sleep(0.001)
+		
+		writenumber(letter["c"])
+		writedigit(digits["digit4"])
+		writeout()
+		writeout_digit()
+		time.sleep(0.001)
 		
 except (KeyboardInterrupt, SystemExit):
     print("Exit...")
     writenumber(0)
     writeout()
+    writedigit(0)
+    writeout_digit()
 
 
 
