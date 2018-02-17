@@ -4,7 +4,7 @@ import time
 #Sleep time (testing only)
 icsleep=0.5
 
-#Define Variables - Segments
+#Define Variables - Numbers
 
 DATAIN=16 #DS
 LATCH=21  #STCP
@@ -15,6 +15,12 @@ CLOCK=20  #SHCP
 DATAIN_DIGIT=22
 LATCH_DIGIT=17
 CLOCK_DIGIT=4
+
+#Define Variables - Letters
+
+DATAIN_LETTER=18
+LATCH_LETTER=23
+CLOCK_LETTER=24
 
 #Define all LEDs
 
@@ -30,51 +36,45 @@ led8=0x01 #00000001
 #Define Digits
 
 digits={"digit1":0x80,
-	"digit2":0x40,
-	"digit3":0x20,
-	"digit4":0x10,
-	"digit5":0x08,
-	"digit6":0x04,
-	"digit7":0x02,
-	"digit8":0x01,
+		"digit2":0x40,
+		"digit3":0x20,
+		"digit4":0x10,
+		"digit5":0x08,
+		"digit6":0x04,
+		"digit7":0x02,
+		"digit8":0x01,
 }
 #Number and Letter Dictionary
 
-letter={"0":0xFC,
-        "1":0x30,
-        "2":0xDA,
-        "3":0x7A,
-        "4":0x36,
-        "5":0x6E,
-        "6":0xEE,
-        "7":0x38,
-        "8":0xFE,
-        "9":0x3E,
-        "a":0xBE,
-        "b":0xE6,
-        "c":0xCC,
-        "d":0xF2,
-        "e":0xCE,
-        "f":0x8E,
-        "g":0x7E,
-        "h":0xB6,
-        "i":0x30,
-        "j":0xF0,
-        "l":0xC4,
-        "n":0xBC,
-        "o":0xFC,
-        "p":0x9E,
-        "s":0x6E,
-        "t":0x38,
-        "u":0xF4,
-        "x":0xB4,
-        "y":0x76,
-        "z":0xDE
+numbers={"0":0xFC,
+         "1":0x30,
+         "2":0xDA,
+         "3":0x7A,
+         "4":0x36,
+         "5":0x6E,
+         "6":0xEE,
+         "7":0x38,
+         "8":0xFE,
+         "9":0x3E,
+         ".":0x01,
 }
 
+letters={
+	"M":0x282A,
+	"P":0x381A,
+	"H":0x3838,
+	"f":0x3802,
+	"t":0x3A00,
+	".":0x40,
+	"N":0x68A8,
+	"E":0x3A12,
+	"W":0x2CA8,
+	"S":0x4230,
+}
 #Setup and Cleanup functions
 
 def setup():
+    
     GPIO.setmode(GPIO.BCM)
     GPIO.cleanup()
     GPIO.setup(DATAIN,GPIO.OUT)
@@ -83,6 +83,9 @@ def setup():
     GPIO.setup(DATAIN_DIGIT,GPIO.OUT)
     GPIO.setup(CLOCK_DIGIT,GPIO.OUT)
     GPIO.setup(LATCH_DIGIT,GPIO.OUT)
+    GPIO.setup(DATAIN_LETTER,GPIO.OUT)
+    GPIO.setup(CLOCK_LETTER,GPIO.OUT)
+    GPIO.setup(LATCH_LETTER,GPIO.OUT)
 
     GPIO.output(LATCH,False) #Latch is used to output the saved data
     GPIO.output(CLOCK,False) #Used to shift the value of DATAIN to the register
@@ -90,11 +93,17 @@ def setup():
     GPIO.output(DATAIN_DIGIT,False) #Data pin for the second shift register
     GPIO.output(CLOCK_DIGIT,False) #clock pin for the second shift register
     GPIO.output(LATCH_DIGIT,False) #latch pin for the second shift register
+    GPIO.output(DATAIN_LETTER,False)
+    GPIO.output(CLOCK_LETTER,False)
+    GPIO.output(LATCH_LETTER,False)
+    
     
 def cleanup():
     #Set all leds to off
     writenumber(0)
     writeout()
+    writedigit(0)
+    writeout_digit()
     
 # Stores a segment "Bit" to the shift register
 
@@ -122,6 +131,19 @@ def shift_digit(input):
    GPIO.output(CLOCK_DIGIT,GPIO.LOW)
    GPIO.output(DATAIN_DIGIT,GPIO.LOW)
    
+#Stores a letter "Bit" to the shift register
+
+def shift_letter(input):
+   if input == 1:
+       input=True
+   else:
+       input=False
+
+   GPIO.output(DATAIN_LETTER,input)
+   GPIO.output(CLOCK_LETTER,GPIO.HIGH)
+   GPIO.output(CLOCK_LETTER,GPIO.LOW)
+   GPIO.output(DATAIN_LETTER,GPIO.LOW)
+   
 #Writes the stored segment "Bit" to Displays
     
 def writeout():
@@ -136,6 +158,11 @@ def writeout_digit():
    GPIO.output(LATCH_DIGIT,GPIO.HIGH)
    GPIO.output(LATCH_DIGIT,GPIO.LOW)
    
+def writeout_letter():
+   #Display LEDs
+   GPIO.output(LATCH_LETTER,GPIO.HIGH)
+   GPIO.output(LATCH_LETTER,GPIO.LOW)
+   
 #Writes a character to the shift register
 
 def writenumber(number):
@@ -145,6 +172,10 @@ def writenumber(number):
 def writedigit(number):
     for x in range(0,8):
         shift_digit((number>>x)%2)
+        
+def writeletter(number):
+    for x in range(0,16):
+        shift_letter((number>>x)%2)
         
 def writexorrange(range):
     #close the chain to have no interrupts while displaying
@@ -176,29 +207,47 @@ try:
 	
 	while True:
 		
-		writenumber(letter["s"])
+		writenumber(numbers["1"])
 		writedigit(digits["digit1"])
 		writeout()
 		writeout_digit()
-		time.sleep(0.001)
+		time.sleep(.001)
 		
-		writenumber(letter["u"])
+		writenumber(numbers["2"])
 		writedigit(digits["digit2"])
 		writeout()
 		writeout_digit()
-		time.sleep(0.001)
+		time.sleep(.001)
 		
-		writenumber(letter["c"])
+		writenumber(numbers["3"])
 		writedigit(digits["digit3"])
 		writeout()
 		writeout_digit()
-		time.sleep(0.001)
+		time.sleep(.001)
 		
-		writenumber(letter["c"])
+		writenumber(numbers["4"])
 		writedigit(digits["digit4"])
 		writeout()
 		writeout_digit()
-		time.sleep(0.001)
+		time.sleep(.001)
+		
+		writeletter(letters["f"])
+		writedigit(digits["digit5"])
+		writeout_letter()
+		writeout_digit()
+		time.sleep(.001)
+		
+		writeletter(letters["t"])
+		writedigit(digits["digit6"])
+		writeout_letter()
+		writeout_digit()
+		time.sleep(.001)
+		
+		writeletter(letters["."])
+		writedigit(digits["digit7"])
+		writeout_letter()
+		writeout_digit()
+		time.sleep(.001)
 		
 except (KeyboardInterrupt, SystemExit):
     print("Exit...")
@@ -206,6 +255,8 @@ except (KeyboardInterrupt, SystemExit):
     writeout()
     writedigit(0)
     writeout_digit()
+    writeletter(0)
+    writeout_letter()
 
 
 
