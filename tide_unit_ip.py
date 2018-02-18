@@ -69,7 +69,7 @@ letters={
 	"N":0x68A8,
 	"E":0x3A12,
 	"W":0x2CA8,
-	"S":0x4230,
+	"S":0x4232,
 }
 #Setup and Cleanup functions
 
@@ -104,6 +104,14 @@ def cleanup():
     writeout()
     writedigit(0)
     writeout_digit()
+    
+def clear():
+	writenumber(0)
+	writeout()
+	writeletter(0)
+	writeout_letter()
+	writedigit(0)
+	writeout_digit()
     
 # Stores a segment "Bit" to the shift register
 
@@ -189,7 +197,9 @@ def writexorrange(range):
         writenumber(character)
         writeout()
     for x in reversed(range):
-        character^=x
+        characte
+        
+        r^=x
         writenumber(character)
         writeout()
     for x in reversed(range):
@@ -211,43 +221,43 @@ try:
 		writedigit(digits["digit1"])
 		writeout()
 		writeout_digit()
-		time.sleep(.001)
+		clear()
 		
-		writenumber(numbers["2"])
+		writenumber(numbers["."])
 		writedigit(digits["digit2"])
 		writeout()
 		writeout_digit()
-		time.sleep(.001)
+		clear()
 		
-		writenumber(numbers["3"])
+		writenumber(numbers["5"])
 		writedigit(digits["digit3"])
 		writeout()
 		writeout_digit()
-		time.sleep(.001)
+		clear()
 		
-		writenumber(numbers["4"])
+		writenumber(numbers["7"])
 		writedigit(digits["digit4"])
 		writeout()
 		writeout_digit()
-		time.sleep(.001)
+		clear()
 		
 		writeletter(letters["f"])
 		writedigit(digits["digit5"])
 		writeout_letter()
 		writeout_digit()
-		time.sleep(.001)
+		clear()
 		
 		writeletter(letters["t"])
 		writedigit(digits["digit6"])
 		writeout_letter()
 		writeout_digit()
-		time.sleep(.001)
+		clear()
 		
 		writeletter(letters["."])
 		writedigit(digits["digit7"])
 		writeout_letter()
 		writeout_digit()
-		time.sleep(.001)
+		clear()
 		
 except (KeyboardInterrupt, SystemExit):
     print("Exit...")
