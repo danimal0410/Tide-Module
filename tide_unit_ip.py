@@ -93,6 +93,7 @@ rating={
 #Letters - 5x7 Arrays
 title={
       "G":0x7C8282925E,
+      "Q":0x7C828A847A,
 }
 
 
@@ -382,8 +383,8 @@ try:
 		writeout_led()
 		clear()
 		
-		printtitle(title["G"])
-    clear()
+		printtitle(title["Q"])
+		clear()
 		
 except (KeyboardInterrupt, SystemExit):
     print("Exit...")
