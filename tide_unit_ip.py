@@ -22,6 +22,11 @@ DATAIN_LETTER=18
 LATCH_LETTER=23
 CLOCK_LETTER=24
 
+#Define Variables - LEDs [Wave Rating]
+DATAIN_LED=6
+LATCH_LED=13
+CLOCK_LED=19
+
 #Define all LEDs
 
 led1=0x80 #10000000
@@ -71,12 +76,20 @@ letters={
 	"W":0x2CA8,
 	"S":0x4232,
 }
+
+rating={
+	"1":0x80,
+	"2":0xC0,
+	"3":0xE0,
+	"4":0xF0,
+	"5":0xF8,
+}
+
 #Setup and Cleanup functions
 
 def setup():
     
     GPIO.setmode(GPIO.BCM)
-    GPIO.cleanup()
     GPIO.setup(DATAIN,GPIO.OUT)
     GPIO.setup(CLOCK,GPIO.OUT)
     GPIO.setup(LATCH,GPIO.OUT)
@@ -86,6 +99,9 @@ def setup():
     GPIO.setup(DATAIN_LETTER,GPIO.OUT)
     GPIO.setup(CLOCK_LETTER,GPIO.OUT)
     GPIO.setup(LATCH_LETTER,GPIO.OUT)
+    GPIO.setup(DATAIN_LED,GPIO.OUT)
+    GPIO.setup(CLOCK_LED,GPIO.OUT)
+    GPIO.setup(LATCH_LED,GPIO.OUT)
 
     GPIO.output(LATCH,False) #Latch is used to output the saved data
     GPIO.output(CLOCK,False) #Used to shift the value of DATAIN to the register
@@ -96,14 +112,11 @@ def setup():
     GPIO.output(DATAIN_LETTER,False)
     GPIO.output(CLOCK_LETTER,False)
     GPIO.output(LATCH_LETTER,False)
+    GPIO.output(DATAIN_LED,False)
+    GPIO.output(CLOCK_LED,False)
+    GPIO.output(LATCH_LED,False)
     
-    
-def cleanup():
-    #Set all leds to off
-    writenumber(0)
-    writeout()
-    writedigit(0)
-    writeout_digit()
+    clear()
     
 def clear():
 	writenumber(0)
@@ -112,6 +125,8 @@ def clear():
 	writeout_letter()
 	writedigit(0)
 	writeout_digit()
+	writeled(0)
+	writeout_led()
     
 # Stores a segment "Bit" to the shift register
 
@@ -151,7 +166,19 @@ def shift_letter(input):
    GPIO.output(CLOCK_LETTER,GPIO.HIGH)
    GPIO.output(CLOCK_LETTER,GPIO.LOW)
    GPIO.output(DATAIN_LETTER,GPIO.LOW)
-   
+  
+def shift_led(input):
+   if input == 1:
+       input=True
+   else:
+       input=False
+
+   GPIO.output(DATAIN_LED,input)
+   GPIO.output(CLOCK_LED,GPIO.HIGH)
+   GPIO.output(CLOCK_LED,GPIO.LOW)
+   GPIO.output(DATAIN_LED,GPIO.LOW) 
+
+
 #Writes the stored segment "Bit" to Displays
     
 def writeout():
@@ -171,6 +198,11 @@ def writeout_letter():
    GPIO.output(LATCH_LETTER,GPIO.HIGH)
    GPIO.output(LATCH_LETTER,GPIO.LOW)
    
+def writeout_led():
+   #Display LEDs
+   GPIO.output(LATCH_LED,GPIO.HIGH)
+   GPIO.output(LATCH_LED,GPIO.LOW)
+   
 #Writes a character to the shift register
 
 def writenumber(number):
@@ -184,6 +216,10 @@ def writedigit(number):
 def writeletter(number):
     for x in range(0,16):
         shift_letter((number>>x)%2)
+        
+def writeled(number):
+    for x in range(0,8):
+        shift_led((number>>x)%2)
         
 def writexorrange(range):
     #close the chain to have no interrupts while displaying
@@ -257,6 +293,10 @@ try:
 		writedigit(digits["digit7"])
 		writeout_letter()
 		writeout_digit()
+		clear()
+		
+		writeled(rating["4"])
+		writeout_led()
 		clear()
 		
 except (KeyboardInterrupt, SystemExit):
