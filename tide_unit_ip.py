@@ -33,61 +33,66 @@ CLOCK_TITLE=25
 
 
 #Digits - Multiplexing
-digits={"digit1":0x8000,
-		    "digit2":0x4000,
-		    "digit3":0x2000,
-		    "digit4":0x1000,
-		    "digit5":0x0800,
-		    "digit6":0x0400,
-		    "digit7":0x0200,
-		    "digit8":0x0100,
-		    "digit9":0x80,
-		    "digit10":0x40,
-		    "digit11":0x20,
-		    "digit12":0x10,
-		    "digit13":0x08,
-		    "digit14":0x04,
-		    "digit15":0x02,
-		    "digit16":0x01,
+digits={
+      "digit1":0x8000,
+      "digit2":0x4000,
+      "digit3":0x2000,
+      "digit4":0x1000,
+      "digit5":0x0800,
+      "digit6":0x0400,
+      "digit7":0x0200,
+      "digit8":0x0100,
+      "digit9":0x80,
+      "digit10":0x40,
+      "digit11":0x20,
+      "digit12":0x10,
+      "digit13":0x08,
+      "digit14":0x04,
+      "digit15":0x02,
+      "digit16":0x01,
 }
 
 #Numbers - 7-Segment
-numbers={"0":0xFC,
-         "1":0x30,
-         "2":0xDA,
-         "3":0x7A,
-         "4":0x36,
-         "5":0x6E,
-         "6":0xEE,
-         "7":0x38,
-         "8":0xFE,
-         "9":0x3E,
-         ".":0x01,
+numbers={
+      "0":0xFC,
+      "1":0x30,
+      "2":0xDA,
+      "3":0x7A,
+      "4":0x36,
+      "5":0x6E,
+      "6":0xEE,
+      "7":0x38,
+      "8":0xFE,
+      "9":0x3E,
+      ".":0x01,
 }
 
 #Letters - 14-Segment
-letters={"M":0x282A,
-	       "P":0x381A,
-	       "H":0x3838,
-	       "f":0x3802,
-	       "t":0x3A00,
-	       ".":0x40,
-	       "N":0x68A8,
-	       "E":0x3A12,
-	       "W":0x2CA8,
-	       "S":0x4232,
+letters={
+      "M":0x282A,
+      "P":0x381A,
+      "H":0x3838,
+      "f":0x3802,
+      "t":0x3A00,
+      ".":0x40,
+      "N":0x68A8,
+      "E":0x3A12,
+      "W":0x2CA8,
+      "S":0x4232,
 }
 
 #LEDs
-rating={"1":0x80,
-        "2":0xC0,
-        "3":0xE0,
-        "4":0xF0,
-        "5":0xF8,
+rating={
+      "1":0x80,
+      "2":0xC0,
+      "3":0xE0,
+      "4":0xF0,
+      "5":0xF8,
 }
 
 #Letters - 5x7 Arrays
-title={"G":0x7C8282925E,
+title={
+      "G":0x7C8282925E,
 }
 
 
