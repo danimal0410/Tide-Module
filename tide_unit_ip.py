@@ -27,6 +27,11 @@ DATAIN_LED=6
 LATCH_LED=13
 CLOCK_LED=19
 
+#Define Variables - Title
+DATAIN_TITLE=26
+LATCH_TITLE=12
+CLOCK_TITLE=25
+
 #Define all LEDs
 
 led1=0x80 #10000000
@@ -38,16 +43,24 @@ led6=0x04 #00000100
 led7=0x02 #00000010
 led8=0x01 #00000001
 
-#Define Digits
+#Digit Dictionary
 
-digits={"digit1":0x80,
-		"digit2":0x40,
-		"digit3":0x20,
-		"digit4":0x10,
-		"digit5":0x08,
-		"digit6":0x04,
-		"digit7":0x02,
-		"digit8":0x01,
+digits={"digit1":0x8000,
+		"digit2":0x4000,
+		"digit3":0x2000,
+		"digit4":0x1000,
+		"digit5":0x0800,
+		"digit6":0x0400,
+		"digit7":0x0200,
+		"digit8":0x0100,
+		"digit9":0x80,
+		"digit10":0x40,
+		"digit11":0x20,
+		"digit12":0x10,
+		"digit13":0x08,
+		"digit14":0x04,
+		"digit15":0x02,
+		"digit16":0x01,
 }
 #Number and Letter Dictionary
 
@@ -85,6 +98,10 @@ rating={
 	"5":0xF8,
 }
 
+title={
+	"G":0x7C8282925E,
+}
+
 #Setup and Cleanup functions
 
 def setup():
@@ -102,6 +119,9 @@ def setup():
     GPIO.setup(DATAIN_LED,GPIO.OUT)
     GPIO.setup(CLOCK_LED,GPIO.OUT)
     GPIO.setup(LATCH_LED,GPIO.OUT)
+    GPIO.setup(DATAIN_TITLE,GPIO.OUT)
+    GPIO.setup(LATCH_TITLE,GPIO.OUT)
+    GPIO.setup(CLOCK_TITLE,GPIO.OUT)
 
     GPIO.output(LATCH,False) #Latch is used to output the saved data
     GPIO.output(CLOCK,False) #Used to shift the value of DATAIN to the register
@@ -115,6 +135,9 @@ def setup():
     GPIO.output(DATAIN_LED,False)
     GPIO.output(CLOCK_LED,False)
     GPIO.output(LATCH_LED,False)
+    GPIO.output(DATAIN_TITLE,False)
+    GPIO.output(LATCH_TITLE,False)
+    GPIO.output(CLOCK_TITLE,False)
     
     clear()
     
@@ -127,8 +150,11 @@ def clear():
 	writeout_digit()
 	writeled(0)
 	writeout_led()
+	writetitle1(0)
+	writeout_title
     
-# Stores a segment "Bit" to the shift register
+
+# Stores a Title "Bit" to the shift register
 
 def shift(input):
    if input == 1:
@@ -140,6 +166,17 @@ def shift(input):
    GPIO.output(CLOCK,GPIO.HIGH)
    GPIO.output(CLOCK,GPIO.LOW)
    GPIO.output(DATAIN,GPIO.LOW)
+
+def shift_title(input):
+   if input == 1:
+       input=True
+   else:
+       input=False
+
+   GPIO.output(DATAIN_TITLE,input)
+   GPIO.output(CLOCK_TITLE,GPIO.HIGH)
+   GPIO.output(CLOCK_TITLE,GPIO.LOW)
+   GPIO.output(DATAIN_TITLE,GPIO.LOW)
    
  # Stores a digit "Bit" to the shift register
 
@@ -186,8 +223,13 @@ def writeout():
    GPIO.output(LATCH,GPIO.HIGH)
    GPIO.output(LATCH,GPIO.LOW)
    
-   #Writes the stored digit "Bit" to Displays
-    
+def writeout_title():
+   #Display LEDs
+   GPIO.output(LATCH_TITLE,GPIO.HIGH)
+   GPIO.output(LATCH_TITLE,GPIO.LOW)
+   
+#Writes the stored digit "Bit" to Displays
+
 def writeout_digit():
    #Display LEDs
    GPIO.output(LATCH_DIGIT,GPIO.HIGH)
@@ -210,7 +252,7 @@ def writenumber(number):
         shift((number>>x)%2)
         
 def writedigit(number):
-    for x in range(0,8):
+    for x in range(0,16):
         shift_digit((number>>x)%2)
         
 def writeletter(number):
@@ -221,27 +263,61 @@ def writeled(number):
     for x in range(0,8):
         shift_led((number>>x)%2)
         
-def writexorrange(range):
-    #close the chain to have no interrupts while displaying
-    character=range[0]&range[-1]
-    for x in range:
-        character^=x
-        writenumber(character)
-        writeout()
-    for x in range:
-        character^=x
-        writenumber(character)
-        writeout()
-    for x in reversed(range):
-        characte
+#Write column bytes to led array shift register        
+
+def writetitle1(number):
+    for x in range(1,8):
+        shift_title((number>>x)%2)
+
+def writetitle2(number):
+    for x in range(9,16):
+        shift_title((number>>x)%2)
         
-        r^=x
-        writenumber(character)
-        writeout()
-    for x in reversed(range):
-        character^=x
-        writenumber(character)
-        writeout()
+def writetitle3(number):
+    for x in range(17,24):
+        shift_title((number>>x)%2)
+        
+def writetitle4(number):
+    for x in range(25,32):
+        shift_title((number>>x)%2)
+        
+def writetitle5(number):
+    for x in range(33,40):
+        shift_title((number>>x)%2)
+        
+def printtitle(number):
+	
+	writetitle1(number)
+	writedigit(digits["digit8"])
+	writeout_title()
+	writeout_digit()
+	clear()
+	
+	writetitle2(number)
+	writedigit(digits["digit9"])
+	writeout_title()
+	writeout_digit()
+	clear()
+	
+	writetitle3(number)
+	writedigit(digits["digit10"])
+	writeout_title()
+	writeout_digit()
+	clear()
+	
+	writetitle4(number)
+	writedigit(digits["digit11"])
+	writeout_title()
+	writeout_digit()
+	clear()
+	
+	writetitle5(number)
+	writedigit(digits["digit12"])
+	writeout_title()
+	writeout_digit()
+	clear()
+
+        
 
 # BEGIN PROGRAM HERE
 
@@ -298,6 +374,9 @@ try:
 		writeled(rating["4"])
 		writeout_led()
 		clear()
+		
+		
+		printtitle(title["G"])
 		
 except (KeyboardInterrupt, SystemExit):
     print("Exit...")
