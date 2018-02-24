@@ -1,69 +1,57 @@
 import RPi.GPIO as GPIO
 import time
 
-#Sleep time (testing only)
-icsleep=0.5
+#Define GPIOs
 
-#Define Variables - Numbers
-
+#Define Variables - 7-Segment
 DATAIN=16 #DS
 LATCH=21  #STCP
 CLOCK=20  #SHCP
 
-#Define Variables - Digits
-
+#Define Variables - Digits - Multiplexing
 DATAIN_DIGIT=22
 LATCH_DIGIT=17
 CLOCK_DIGIT=4
 
-#Define Variables - Letters
-
+#Define Variables - Letters - 14-Segment
 DATAIN_LETTER=18
 LATCH_LETTER=23
 CLOCK_LETTER=24
 
-#Define Variables - LEDs [Wave Rating]
+#Define Variables - LEDs [Wave Rating & Auxilary Funtions]
 DATAIN_LED=6
 LATCH_LED=13
 CLOCK_LED=19
 
-#Define Variables - Title
+#Define Variables - Title - 5x7 Arrays
 DATAIN_TITLE=26
 LATCH_TITLE=12
 CLOCK_TITLE=25
 
-#Define all LEDs
 
-led1=0x80 #10000000
-led2=0x40 #01000000
-led3=0x20 #00100000
-led4=0x10 #00010000
-led5=0x08 #00001000
-led6=0x04 #00000100
-led7=0x02 #00000010
-led8=0x01 #00000001
+#Dictionaries
 
-#Digit Dictionary
 
+#Digits - Multiplexing
 digits={"digit1":0x8000,
-		"digit2":0x4000,
-		"digit3":0x2000,
-		"digit4":0x1000,
-		"digit5":0x0800,
-		"digit6":0x0400,
-		"digit7":0x0200,
-		"digit8":0x0100,
-		"digit9":0x80,
-		"digit10":0x40,
-		"digit11":0x20,
-		"digit12":0x10,
-		"digit13":0x08,
-		"digit14":0x04,
-		"digit15":0x02,
-		"digit16":0x01,
+		    "digit2":0x4000,
+		    "digit3":0x2000,
+		    "digit4":0x1000,
+		    "digit5":0x0800,
+		    "digit6":0x0400,
+		    "digit7":0x0200,
+		    "digit8":0x0100,
+		    "digit9":0x80,
+		    "digit10":0x40,
+		    "digit11":0x20,
+		    "digit12":0x10,
+		    "digit13":0x08,
+		    "digit14":0x04,
+		    "digit15":0x02,
+		    "digit16":0x01,
 }
-#Number and Letter Dictionary
 
+#Numbers - 7-Segment
 numbers={"0":0xFC,
          "1":0x30,
          "2":0xDA,
@@ -77,33 +65,36 @@ numbers={"0":0xFC,
          ".":0x01,
 }
 
-letters={
-	"M":0x282A,
-	"P":0x381A,
-	"H":0x3838,
-	"f":0x3802,
-	"t":0x3A00,
-	".":0x40,
-	"N":0x68A8,
-	"E":0x3A12,
-	"W":0x2CA8,
-	"S":0x4232,
+#Letters - 14-Segment
+letters={"M":0x282A,
+	       "P":0x381A,
+	       "H":0x3838,
+	       "f":0x3802,
+	       "t":0x3A00,
+	       ".":0x40,
+	       "N":0x68A8,
+	       "E":0x3A12,
+	       "W":0x2CA8,
+	       "S":0x4232,
 }
 
-rating={
-	"1":0x80,
-	"2":0xC0,
-	"3":0xE0,
-	"4":0xF0,
-	"5":0xF8,
+#LEDs
+rating={"1":0x80,
+        "2":0xC0,
+        "3":0xE0,
+        "4":0xF0,
+        "5":0xF8,
 }
 
-title={
-	"G":0x7C8282925E,
+#Letters - 5x7 Arrays
+title={"G":0x7C8282925E,
 }
 
-#Setup and Cleanup functions
 
+#Functions
+
+
+#GPIO Setup
 def setup():
     
     GPIO.setmode(GPIO.BCM)
@@ -123,12 +114,12 @@ def setup():
     GPIO.setup(LATCH_TITLE,GPIO.OUT)
     GPIO.setup(CLOCK_TITLE,GPIO.OUT)
 
-    GPIO.output(LATCH,False) #Latch is used to output the saved data
-    GPIO.output(CLOCK,False) #Used to shift the value of DATAIN to the register
-    GPIO.output(DATAIN,False) #Databit to be shifted into the register
-    GPIO.output(DATAIN_DIGIT,False) #Data pin for the second shift register
-    GPIO.output(CLOCK_DIGIT,False) #clock pin for the second shift register
-    GPIO.output(LATCH_DIGIT,False) #latch pin for the second shift register
+    GPIO.output(LATCH,False)
+    GPIO.output(CLOCK,False)
+    GPIO.output(DATAIN,False)
+    GPIO.output(DATAIN_DIGIT,False)
+    GPIO.output(CLOCK_DIGIT,False)
+    GPIO.output(LATCH_DIGIT,False)
     GPIO.output(DATAIN_LETTER,False)
     GPIO.output(CLOCK_LETTER,False)
     GPIO.output(LATCH_LETTER,False)
@@ -141,6 +132,7 @@ def setup():
     
     clear()
     
+#Clears IO values from all Shift Registers
 def clear():
 	writenumber(0)
 	writeout()
@@ -154,8 +146,10 @@ def clear():
 	writeout_title
     
 
-# Stores a Title "Bit" to the shift register
+#Shift functions store bits of data to shift registers
 
+
+#7-Segment
 def shift(input):
    if input == 1:
        input=True
@@ -167,6 +161,7 @@ def shift(input):
    GPIO.output(CLOCK,GPIO.LOW)
    GPIO.output(DATAIN,GPIO.LOW)
 
+#5x7 Arrays
 def shift_title(input):
    if input == 1:
        input=True
@@ -178,8 +173,8 @@ def shift_title(input):
    GPIO.output(CLOCK_TITLE,GPIO.LOW)
    GPIO.output(DATAIN_TITLE,GPIO.LOW)
    
- # Stores a digit "Bit" to the shift register
 
+#Digits - Multiplexing
 def shift_digit(input):
    if input == 1:
        input=True
@@ -191,8 +186,8 @@ def shift_digit(input):
    GPIO.output(CLOCK_DIGIT,GPIO.LOW)
    GPIO.output(DATAIN_DIGIT,GPIO.LOW)
    
-#Stores a letter "Bit" to the shift register
 
+#14-Segment
 def shift_letter(input):
    if input == 1:
        input=True
@@ -204,6 +199,7 @@ def shift_letter(input):
    GPIO.output(CLOCK_LETTER,GPIO.LOW)
    GPIO.output(DATAIN_LETTER,GPIO.LOW)
   
+#LEDs and Auxilary Functions
 def shift_led(input):
    if input == 1:
        input=True
@@ -216,55 +212,60 @@ def shift_led(input):
    GPIO.output(DATAIN_LED,GPIO.LOW) 
 
 
-#Writes the stored segment "Bit" to Displays
+#Writeout functions operate the latch pin on each shift register and shift stored IO values out to displays
     
+
+#7-Segment
 def writeout():
-   #Display LEDs
    GPIO.output(LATCH,GPIO.HIGH)
    GPIO.output(LATCH,GPIO.LOW)
    
+#5x7 Array
 def writeout_title():
-   #Display LEDs
    GPIO.output(LATCH_TITLE,GPIO.HIGH)
    GPIO.output(LATCH_TITLE,GPIO.LOW)
    
-#Writes the stored digit "Bit" to Displays
-
+#Digits - Multiplexing
 def writeout_digit():
    #Display LEDs
    GPIO.output(LATCH_DIGIT,GPIO.HIGH)
    GPIO.output(LATCH_DIGIT,GPIO.LOW)
    
+#14-Segment
 def writeout_letter():
-   #Display LEDs
    GPIO.output(LATCH_LETTER,GPIO.HIGH)
    GPIO.output(LATCH_LETTER,GPIO.LOW)
    
+#LEDs and Auxilary Functions
 def writeout_led():
-   #Display LEDs
    GPIO.output(LATCH_LED,GPIO.HIGH)
    GPIO.output(LATCH_LED,GPIO.LOW)
    
-#Writes a character to the shift register
 
+#Write functions allow shift functions to read/access library values
+
+
+#7-Segment
 def writenumber(number):
     for x in range(0,8):
         shift((number>>x)%2)
         
+#Digits - Multiplexing
 def writedigit(number):
     for x in range(0,16):
         shift_digit((number>>x)%2)
         
+#14-Segment
 def writeletter(number):
     for x in range(0,16):
         shift_letter((number>>x)%2)
         
+#LEDs and Auxilary Functions
 def writeled(number):
     for x in range(0,8):
         shift_led((number>>x)%2)
         
-#Write column bytes to led array shift register        
-
+#5x7 Array - One write function for each column of LEDs (one byte per column)       
 def writetitle1(number):
     for x in range(1,8):
         shift_title((number>>x)%2)
@@ -285,6 +286,7 @@ def writetitle5(number):
     for x in range(33,40):
         shift_title((number>>x)%2)
         
+#Allows for Multiplexing of individual LED columns on 5x7 Array
 def printtitle(number):
 	
 	writetitle1(number)
@@ -375,17 +377,12 @@ try:
 		writeout_led()
 		clear()
 		
-		
 		printtitle(title["G"])
+    clear()
 		
 except (KeyboardInterrupt, SystemExit):
     print("Exit...")
-    writenumber(0)
-    writeout()
-    writedigit(0)
-    writeout_digit()
-    writeletter(0)
-    writeout_letter()
+    clear()
 
 
 
