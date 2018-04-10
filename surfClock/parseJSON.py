@@ -12,7 +12,7 @@ def updateSurfData():
     try:
         apiRequest = requests.get('http://magicseaweed.com/api/19443130b5ae2758d1b254b8da7ea460/forecast/?spot_id=279&fields=localTimestamp,fadedRating,solidRating,swell.*,wind.speed,wind.unit,wind.compassDirection')
         apiResponse = apiRequest.json()
-        print 'apiResponse', apiResponse
+        print 'apiResponse', apiResponse #doesn't work
 
         return apiResponse
 
