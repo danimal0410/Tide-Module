@@ -1,1 +1,1 @@
-python surfClock/parseJSON.py
+python3 surfClock/parseJSON.py
