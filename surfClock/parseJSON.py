@@ -6,7 +6,6 @@ import threading, time, json, requests
 
 
 def updateSurfData():
-
 # set up a secondary thread so that the clock can run concurrently with the update data function
 # threading.Timer(7200.0, updateSurfData).start()
 
@@ -73,11 +72,44 @@ def parseSurfData(surfCast):
     except:
         print("ERROR: Couldn't format data")
 
+# setting up LED output through GPIO pins based on forecast components
+def updateLEDS():
+    try:
+        print("length of combined star rating", len(combinedStarRating))
+
+        if (len(combinedStarRating) == 0):
+            print("Star Rating is 0, go back to sleep brah")
+            # "0": reset all LED pins
+
+        elif (len(combinedStarRating) == 1):
+            # "1":0x80
+            print("Star Rating might as well be 0, go back to sleep Chad")
+
+        elif (len(combinedStarRating) == 2):
+            # "2":0xC0
+            print("Star Rating is 2, are you craving it?")
+
+        elif (len(combinedStarRating) == 3):
+            # "3":0xE0
+            print("Star Rating is 3, yup totally worth it c'mon bud")
+
+        elif (len(combinedStarRating) == 4):
+            # "4":0xF0
+            print("Star Rating is 4, time to get gnarly")
+
+        elif (len(combinedStarRating) == 5):
+            # "5":0xF8
+            print("Star Rating is 3, GET PITTED SO PITTED")
+
+    except:
+        print("ERROR: Couldn't update LEDs with new data")
+
 # runs all functions in one go
 def main():
     try:
         surfData = updateSurfData()
         parseSurfData(surfData)
+        # updateLEDS()
     except:
         print("ERROR: Main function couldn't complete")
 
