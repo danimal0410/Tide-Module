@@ -24,7 +24,7 @@ def updateSurfData():
 def parseSurfData(surfCast):
     i = 0
     currentTime = int(time.time())
-    print("Current Time: ", time.ctime(currentTime))
+    print("Current Time: ", time.strftime('%-I:%M%p %m-%d-%Y', time.localtime(currentTime)))
 
     try:
         while i < 40:
@@ -43,8 +43,8 @@ def parseSurfData(surfCast):
                 i += 1
 
 # parse the JSON response object using the current forecast number from above
-        print("Last forecast was:", time.ctime(surfCast[currentForecast]['localTimestamp']))
-        localTimestamp = time.strftime('%H:%M:%S %m-%d-%Y', time.localtime(surfCast[currentForecast]['localTimestamp']))
+        print("Last forecast was:", time.strftime('%-I:%M%p %m-%d-%Y', time.localtime(surfCast[currentForecast]['localTimestamp'])))
+        localTimestamp = time.strftime('%-I:%M%p %m-%d-%Y', time.localtime(surfCast[currentForecast]['localTimestamp']))
         solidRating = surfCast[currentForecast]['solidRating']
         fadedRating = surfCast[currentForecast]['fadedRating']
         combinedStarRating = surfCast[currentForecast]['solidRating'] - surfCast[currentForecast]['fadedRating']
